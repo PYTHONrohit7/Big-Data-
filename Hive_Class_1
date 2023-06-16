@@ -1,0 +1,99 @@
+create database hive_class_b1;
+use hive_class_b1;
+
+hive>create table department_data                                                                                                            
+    hive> (                                                                                                                                       
+    hive> dept_id int,                                                                                                                            
+    hive> dept_name string,                                                                                                                       
+    hive> manager_id int,                                                                                                                         
+    hive> salary int)                                                                                                                             
+    hive> row format delimited                                                                                                                    
+    hive> fields terminated by ','; 
+    hive>describe department_data;
+    hive>describe formatted department_data;
+
+# For data load from local
+hive>load data local inpath 'file:///tmp/hive_class/depart_data.csv' into table department_data; 
+
+# Display column name
+hive>set hive.cli.print.header = true;
+
+# Load data from hdfs location
+hive>load data inpath '/tmp/hive_data_class_2/' into table department_data_from_hdfs;
+
+
+# Create external table 
+
+hive>create external table department_data_external                                                                                          
+    hive> (                                                                                                                                       
+    hive> dept_id int,                                                                                                                            
+    hive> dept_name string,                                                                                                                       
+    hive> manager_id int,                                                                                                                         
+    hive> salary int                                                                                                                              
+    hive> )                                                                                                                                       
+    hive> row format delimited                                                                                                                    
+    hive> fields terminated by ','                                                                                                                
+    hive> location '/tmp/hive_data_class_2/'; 
+    
+    
+    
+# work with Array data types
+
+hive>create table employee                                                                                                                   
+    hive> (                                                                                                                                       
+    hive> id int,                                                                                                                                 
+    hive> name string,                                                                                                                            
+    hive> skills array<string>                                                                                                                    
+    hive> )                                                                                                                                       
+    hive> row format delimited                                                                                                                    
+    hive> fields terminated by ','                                                                                                                
+    hive> collection items terminated by ':';                                                                                                     
+
+hive>load data local inpath 'file:///tmp/hive_class/array_data.csv' into table employee; 
+
+
+# Get element by index in hive array data type
+
+hive>select id, name, skills[0] as prime_skill from employee;
+#different types of indexing opration
+hive>select                                                                                                                                  
+    hive> id,                                                                                                                                     
+    hive> name,                                                                                                                                   
+    hive> size(skills) as size_of_each_array,                                                                                                     
+    hive> array_contains(skills,"HADOOP") as knows_hadoop,                                                                                        
+    hive> sort_array(skills) as sorted_array                                                                                                                     
+    hive> from employee; 
+## we also write in single line
+hive>select                                                                                                                                  
+    hive> id, name, size(skills) as size_of_each_array, array_contains(skills,"HADOOP") as knows_hadoop, sort_array(skills) as sorted_array  from employee
+
+# table for map data
+
+hive>create table employee_map_data                                                                                                          
+    hive> (                                                                                                                                       
+    hive> id int,                                                                                                                                 
+    hive> name string,                                                                                                                            
+    hive> details map<string,string>                                                                                                              
+    hive> )                                                                                                                                       
+    hive> row format delimited                                                                                                                    
+    hive> fields terminated by ','                                                                                                                
+    hive> collection items terminated by '|'                                                                                                      
+    hive> map keys terminated by ':';
+    
+hive> load data local inpath 'file:///tmp/hive_class/map_data.csv' into table employee_map_data;
+ 
+ hive>select                                                                                                                                  
+    hive> id,                                                                                                                                     
+    hive> name,                                                                                                                                   
+    hive> details["gender"] as employee_gender                                                                                                    
+    hive> from employee_map_data; 
+ 
+ # map functions
+ hive>select                                                                                                                                  
+    hive> id,                                                                                                                                     
+    hive> name,                                                                                                                                   
+    hive> details,                                                                                                                                
+    hive> size(details) as size_of_each_map,                                                                                                      
+    hive> map_keys(details) as distinct_map_keys,                                                                                                 
+    hive> map_values(details) as distinct_map_values                                                                                              
+    hive> from employee_map_data; 
